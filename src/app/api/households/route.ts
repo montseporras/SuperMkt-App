@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createHouseholdSchema } from "@/lib/schemas";
+import { describeDbError } from "@/server/db-errors";
 import { createHousehold } from "@/server/repo";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ token }, { status: 201 });
   } catch (e) {
     console.error("createHousehold", e);
-    return NextResponse.json({ error: "No se pudo crear el hogar" }, { status: 500 });
+    const { hint, code } = describeDbError(e);
+    return NextResponse.json({ error: `No se pudo crear el hogar. ${hint}`, code }, { status: 500 });
   }
 }
